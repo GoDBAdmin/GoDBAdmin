@@ -19,7 +19,7 @@ echo ""
 # Check if running as root or with sudo
 if [ "$EUID" -ne 0 ]; then 
     echo "This script requires sudo privileges"
-    echo "Please run: sudo bash -c \"\$(curl -sSL https://raw.githubusercontent.com/$GITHUB_REPO/main/scripts/setup-apt-repo.sh)\""
+    echo "Please run: sudo bash -c \"\$(curl -sSL https://raw.githubusercontent.com/$GITHUB_REPO/master/scripts/setup-apt-repo.sh)\""
     exit 1
 fi
 
@@ -31,7 +31,7 @@ EOF
 
 # Import GPG key if needed (for signed repositories)
 # Uncomment if you add GPG signing later
-# curl -sSL https://raw.githubusercontent.com/$GITHUB_REPO/main/apt-repo/KEY.gpg | apt-key add -
+# curl -sSL https://raw.githubusercontent.com/$GITHUB_REPO/master/apt-repo/KEY.gpg | apt-key add -
 
 # Update apt
 echo "Updating apt cache..."

@@ -188,6 +188,23 @@ sudo systemctl enable go-dbadmin
 
 Access the web interface at `http://localhost:8090`
 
+### Production Setup with Nginx/Apache and SSL
+
+For production deployment with domain and SSL certificate:
+
+- **Complete Guide**: [Production Setup Guide](PRODUCTION-SETUP.md)
+- **Nginx Setup**: [Nginx Configuration](NGINX-SETUP.md)
+- **Apache Setup**: [Apache Configuration](APACHE-SETUP.md)
+
+**Quick Setup:**
+```bash
+# Nginx with SSL
+sudo ./local-scripts/setup-nginx.sh your-domain.com yes
+
+# Apache with SSL
+sudo ./local-scripts/setup-apache.sh your-domain.com yes
+```
+
 ## Usage
 
 1. **Login**: Access the web interface and login with your MySQL credentials

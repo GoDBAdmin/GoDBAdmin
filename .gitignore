@@ -52,7 +52,14 @@ temp/
 *.tar.gz
 *.tar.xz
 debian/files
+debian/go-dbadmin/
 debian/mysql-web-admin/
+debian/*.substvars
+debian/*.postrm.debhelper
+debian/*.postinst.debhelper
+debian/*.prerm.debhelper
+debian/debhelper-build-stamp
+debian/.debhelper/
 
 # APT repository (local)
 repo/

@@ -63,7 +63,7 @@ jobs:
       - name: Create APT repository structure
         run: |
           mkdir -p apt-repo/pool/main
-          cp ${{ steps.deb_file.outputs.file }} apt-repo/pool/main/
+          cp ${{ steps.deb_file.outputs.file }} apt-repo/pool/master/
           cd apt-repo
           dpkg-scanpackages pool/ > Packages 2>/dev/null || dpkg-scanpackages . /dev/null > Packages
           gzip -k -f Packages
@@ -84,7 +84,7 @@ jobs:
             
             ```bash
             # Add repository
-            curl -sSL https://raw.githubusercontent.com/GoDBAdmin/GoDBAdmin/main/scripts/setup-apt-repo.sh | sudo bash
+            curl -sSL https://raw.githubusercontent.com/GoDBAdmin/GoDBAdmin/master/scripts/setup-apt-repo.sh | sudo bash
             
             # Install
             sudo apt-get update
