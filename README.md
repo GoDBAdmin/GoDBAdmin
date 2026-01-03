@@ -52,7 +52,7 @@ GoDBAdmin is a powerful, open-source MySQL database administration tool that pro
 
 ```bash
 # One-line installation
-curl -sSL https://raw.githubusercontent.com/GoDBAdmin/GoDBAdmin/main/scripts/setup-apt-repo.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/GoDBAdmin/GoDBAdmin/master/scripts/setup-apt-repo.sh | sudo bash
 sudo apt-get update
 sudo apt-get install go-dbadmin
 ```
