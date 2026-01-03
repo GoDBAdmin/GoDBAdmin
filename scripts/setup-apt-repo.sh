@@ -6,7 +6,7 @@
 set -e
 
 GITHUB_REPO="GoDBAdmin/GoDBAdmin"
-GITHUB_PAGES_URL="https://GoDBAdmin.github.io/GoDBAdmin"
+GITHUB_PAGES_URL="https://GoDBAdmin.github.io/GoDBAdmin/apt-repo"
 
 echo "========================================="
 echo "GoDBAdmin - Setup APT Repository"

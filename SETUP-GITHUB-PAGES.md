@@ -1,154 +1,76 @@
-# GitHub Pages Setup Guide for APT Repository
+# راهنمای فعال‌سازی GitHub Pages
 
-This guide explains how to set up `https://GoDBAdmin.github.io/GoDBAdmin`.
+برای فعال‌سازی آدرس `https://GoDBAdmin.github.io/GoDBAdmin` باید مراحل زیر را انجام دهید:
 
-## Prerequisites
+## مرحله 1: Deploy فایل‌ها به GitHub
 
-1. Repository `GoDBAdmin/GoDBAdmin` must be created on GitHub
-2. Access to the repository for pushing
-3. `.deb` package must be built
-
-## Setup Steps
-
-### Step 1: Build Debian Package
+ابتدا باید فایل‌های مخزن APT را به branch `master` push کنید:
 
 ```bash
 cd mysql-admin-tool
+./local-scripts/deploy-apt-repo-to-github.sh 1.0.0 master
+```
+
+یا به صورت دستی:
+
+```bash
+# 1. ساخت پکیج
 ./local-scripts/build-deb.sh 1.0.0
-```
 
-The `.deb` package will be created in the parent directory.
-
-### Step 2: Create Local APT Repository
-
-```bash
+# 2. ایجاد مخزن APT
 ./local-scripts/simple-repo.sh
-```
 
-This command:
-- Copies the `.deb` package to `repo/pool/master/`
-- Creates `Packages` and `Packages.gz` files
-
-### Step 3: Create Branch for GitHub Pages
-
-**Important Note:** GitHub Pages can use any branch. You can:
-- Use the `gh-pages` branch (old default)
-- Use the `main` or `master` branch
-- Use any other branch you want
-
-**Option 1: Using Separate Branch (Recommended)**
-```bash
-# Make sure you're on the main branch
-git checkout main
-git pull origin main
-
-# Create new branch (you can use any name)
-git checkout -b gh-pages
-# or
-git checkout -b pages
-# or any other name you want
-```
-
-**Option 2: Using main Branch**
-```bash
-# If you want to use the main branch
-git checkout main
-git pull origin main
-```
-
-**Option 3: Using Another Branch**
-```bash
-# Create branch with desired name
-git checkout -b apt-repo
-```
-
-### Step 4: Prepare Files for GitHub Pages
-
-```bash
-# Remove all previous files in gh-pages (optional)
-# git rm -rf .
-
-# Copy APT repository files
-mkdir -p apt-repo
-cp -r repo/* apt-repo/
-
-# Or if you want to copy only essential files:
+# 3. آماده‌سازی فایل‌ها
 mkdir -p apt-repo/pool/main
-cp repo/pool/master/*.deb apt-repo/pool/master/
-cp repo/Packages apt-repo/
-cp repo/Packages.gz apt-repo/
-```
-
-### Step 5: Commit and Push to GitHub
-
-```bash
-# Add files
-git add apt-repo/
-
-# Commit
-git commit -m "Add APT repository for GoDBAdmin"
-
-# Push to GitHub
-git push origin gh-pages
-```
-
-### Step 6: Enable GitHub Pages
-
-1. Go to the `GoDBAdmin/GoDBAdmin` repository on GitHub
-2. Go to **Settings** → **Pages**
-3. In the **Source** section:
-   - **Branch**: Select your desired branch (e.g., `gh-pages`, `main`, or any other branch)
-   - **Folder**: Select `/apt-repo` (or `/ (root)` if files are in root)
-4. Click **Save**
-
-**Note:** If you're using the `main` branch and files are in the `apt-repo/` folder, you must set the Folder to `/apt-repo`.
-
-### Step 7: Verification
-
-After a few minutes, the following address should be accessible:
-```
-https://GoDBAdmin.github.io/GoDBAdmin/
-```
-
-You can verify with:
-```bash
-curl -I https://GoDBAdmin.github.io/GoDBAdmin/Packages.gz
-```
-
-If you get `200 OK`, everything is working correctly!
-
-## Updating Repository
-
-To update the repository after building a new version:
-
-```bash
-# 1. Build new package
-./local-scripts/build-deb.sh 1.0.1
-
-# 2. Create new repository
-./local-scripts/simple-repo.sh
-
-# 3. Switch to gh-pages branch
-git checkout gh-pages
-
-# 4. Copy new files
-cp repo/pool/master/*.deb apt-repo/pool/master/
+cp ../go-dbadmin_*.deb apt-repo/pool/master/
 cp repo/Packages apt-repo/
 cp repo/Packages.gz apt-repo/
 
-# 5. Commit and Push
+# 4. Commit و Push
+git checkout master
 git add apt-repo/
-git commit -m "Update APT repository to version 1.0.1"
-git push origin gh-pages
+git commit -m "Add APT repository"
+git push origin master
 ```
 
-## Final Structure
+## مرحله 2: فعال‌سازی GitHub Pages در GitHub
 
-After setup, the structure in the selected branch should look like this:
+### روش 1: از طریق وب‌سایت GitHub
 
-**If using apt-repo folder:**
+1. به ریپو `GoDBAdmin/GoDBAdmin` در GitHub بروید
+2. روی **Settings** کلیک کنید (در منوی بالای ریپو)
+3. در منوی سمت چپ، **Pages** را انتخاب کنید
+4. در بخش **Source**:
+   - **Branch**: `master` را انتخاب کنید
+   - **Folder**: `/apt-repo` را انتخاب کنید (یا `/ (root)` اگر فایل‌ها در root هستند)
+5. روی **Save** کلیک کنید
+
+### روش 2: از طریق GitHub CLI (اختیاری)
+
+```bash
+gh repo edit GoDBAdmin/GoDBAdmin --enable-pages --pages-branch master --pages-source /apt-repo
 ```
-branch-name/
+
+## مرحله 3: بررسی
+
+بعد از فعال‌سازی:
+
+1. **چند دقیقه صبر کنید** (معمولاً 1-5 دقیقه) تا GitHub Pages deploy شود
+2. **بررسی کنید** که deploy موفق بوده:
+   - به Settings → Pages بروید
+   - در بخش "Build and deployment" باید پیام "Your site is live at..." را ببینید
+3. **تست کنید**:
+   ```bash
+   curl -I https://GoDBAdmin.github.io/GoDBAdmin/apt-repo/Packages.gz
+   ```
+   باید پاسخ `200 OK` دریافت کنید
+
+## ساختار مورد نیاز
+
+برای اینکه GitHub Pages کار کند، ساختار فایل‌ها باید به این صورت باشد:
+
+```
+master/
 └── apt-repo/
     ├── Packages
     ├── Packages.gz
@@ -157,87 +79,67 @@ branch-name/
             └── go-dbadmin_1.0.0-1_amd64.deb
 ```
 
-**If files are placed directly in root:**
-```
-branch-name/
-├── Packages
-├── Packages.gz
-└── pool/
-    └── main/
-        └── go-dbadmin_1.0.0-1_amd64.deb
-```
+**نکته مهم:** در تنظیمات GitHub Pages، اگر فایل‌ها در `apt-repo/` هستند، Folder را `/apt-repo` تنظیم کنید.
 
-**Note:** In GitHub Pages settings, if files are in `apt-repo/`, set Folder to `/apt-repo`. If they're in root, select `/ (root)`.
+## عیب‌یابی
 
-## Troubleshooting
+### مشکل: "404 Not Found"
 
-### Error: "404 Not Found"
+**راه‌حل:**
+1. مطمئن شوید که branch `master` push شده است
+2. بررسی کنید که GitHub Pages فعال است (Settings → Pages)
+3. مطمئن شوید که Folder را درست تنظیم کرده‌اید:
+   - اگر فایل‌ها در `apt-repo/` هستند → `/apt-repo`
+   - اگر فایل‌ها در root هستند → `/ (root)`
+4. چند دقیقه صبر کنید تا deploy شود
 
-- Make sure the `gh-pages` branch has been created
-- Check that GitHub Pages is enabled (Settings → Pages)
-- Wait a few minutes for GitHub Pages to deploy
+### مشکل: "Your site is ready to be published"
 
-### Error: "Packages file not found"
+**راه‌حل:**
+- این پیام یعنی GitHub Pages هنوز deploy نشده است
+- چند دقیقه صبر کنید
+- یا یک commit جدید push کنید تا deploy دوباره شروع شود
 
-- Make sure the `Packages.gz` file exists in `apt-repo/`
-- Check that the path is correct: `apt-repo/Packages.gz`
+### مشکل: "Build failed"
 
-### Error: "Repository structure incorrect"
+**راه‌حل:**
+- بررسی کنید که فایل `index.html` یا فایل‌های static در مسیر درست هستند
+- برای مخزن APT، نیازی به `index.html` نیست
+- فقط فایل‌های `Packages` و `Packages.gz` و `.deb` کافی است
 
-- The structure must be exactly like this:
-  ```
-  apt-repo/
-  ├── Packages
-  ├── Packages.gz
-  └── pool/master/*.deb
-  ```
+## بررسی وضعیت Deploy
 
-## Using Automated Script (Recommended)
+برای بررسی وضعیت deploy:
 
-You can create a script to automate this process:
+1. به Settings → Pages بروید
+2. در بخش "Build and deployment" می‌توانید:
+   - آخرین deploy را ببینید
+   - تاریخ و زمان deploy را ببینید
+   - در صورت خطا، پیام خطا را ببینید
+
+## نکات مهم
+
+1. **اولین deploy ممکن است 5-10 دقیقه طول بکشد**
+2. **بعد از هر push جدید، deploy دوباره انجام می‌شود**
+3. **فقط branch های public قابل استفاده برای GitHub Pages هستند**
+4. **اگر ریپو private است، باید GitHub Pro داشته باشید**
+
+## دستورات سریع
 
 ```bash
-#!/bin/bash
-# deploy-apt-repo.sh
+# Deploy کامل
+./local-scripts/deploy-apt-repo-to-github.sh 1.0.0 master
 
-VERSION=${1:-1.0.0}
+# بررسی دسترسی
+curl -I https://GoDBAdmin.github.io/GoDBAdmin/apt-repo/Packages.gz
 
-# Build package
-./local-scripts/build-deb.sh $VERSION
-
-# Create repository
-./local-scripts/simple-repo.sh
-
-# Switch to gh-pages
-git checkout gh-pages || git checkout -b gh-pages
-
-# Copy files
-mkdir -p apt-repo/pool/main
-cp repo/pool/master/*.deb apt-repo/pool/master/
-cp repo/Packages apt-repo/
-cp repo/Packages.gz apt-repo/
-
-# Commit and push
-git add apt-repo/
-git commit -m "Update APT repository to version $VERSION"
-git push origin gh-pages
-
-# Switch back to main
-git checkout main
-
-echo "APT repository deployed successfully!"
-echo "URL: https://GoDBAdmin.github.io/GoDBAdmin/"
+# بررسی محتویات
+curl https://GoDBAdmin.github.io/GoDBAdmin/apt-repo/Packages.gz | gunzip | head -20
 ```
 
-## Important Notes
+## پشتیبانی
 
-1. **Always keep the `gh-pages` branch separate** - This branch is only for GitHub Pages
-2. **Don't add unnecessary files** - Only push APT repository files
-3. **Use `.gitignore`** - Ignore build and temporary files
-4. **Check that files are public** - GitHub Pages only serves public files
-
-## Support
-
-If you encounter any issues:
+اگر مشکل داشتید:
 - Issues: https://github.com/GoDBAdmin/GoDBAdmin/issues
-- Documentation: [GitHub APT Repository Guide](docs/GITHUB-APT-REPO.md)
+- GitHub Pages Docs: https://docs.github.com/en/pages
+

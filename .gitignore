@@ -75,6 +75,9 @@ backend/bin/
 
 # Local scripts (not for GitHub)
 local-scripts/
+*.sh
+# Exception: public script for GitHub installation
+!scripts/setup-apt-repo.sh
 
 # Documentation (not for GitHub)
 docs/
