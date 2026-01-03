@@ -1,0 +1,31 @@
+# GoDBAdmin Configuration
+
+# Server settings
+server:
+  port: 8090
+  host: "0.0.0.0"
+
+# MySQL connection settings
+database:
+  host: "localhost"
+  port: 3306
+  user: "root"
+  password: ""
+  database: "mysql"
+  max_connections: 25
+  max_idle_connections: 5
+
+# Authentication
+auth:
+  jwt_secret: "change-this-secret-in-production"
+  token_expiry: "24h"
+
+# Frontend
+frontend:
+  path: "/usr/share/go-dbadmin"
+
+# Logging
+logging:
+  level: "info"
+  file: "/var/log/go-dbadmin/app.log"
+

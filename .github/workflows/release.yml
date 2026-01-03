@@ -1,0 +1,116 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential debhelper
+      
+      - name: Extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+      
+      - name: Build Debian package
+        run: |
+          cd ${{ github.workspace }}
+          SKIP_DEPS=true ./build-deb.sh ${{ steps.version.outputs.version }}
+      
+      - name: Find .deb file
+        id: deb_file
+        run: |
+          DEB_FILE=$(ls -1 ../go-dbadmin_*.deb 2>/dev/null | head -1)
+          if [ -z "$DEB_FILE" ]; then
+            echo "Error: .deb file not found"
+            exit 1
+          fi
+          echo "file=$DEB_FILE" >> $GITHUB_OUTPUT
+          echo "Found: $DEB_FILE"
+      
+      - name: Create APT repository structure
+        run: |
+          mkdir -p apt-repo/pool/main
+          cp ${{ steps.deb_file.outputs.file }} apt-repo/pool/main/
+          cd apt-repo
+          dpkg-scanpackages pool/ > Packages 2>/dev/null || dpkg-scanpackages . /dev/null > Packages
+          gzip -k -f Packages
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{ steps.deb_file.outputs.file }}
+          draft: false
+          prerelease: false
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body: |
+            ## GoDBAdmin v${{ steps.version.outputs.version }}
+            
+            ### Installation from APT
+            
+            ```bash
+            # Add repository
+            curl -sSL https://raw.githubusercontent.com/GoDBAdmin/GoDBAdmin/main/scripts/setup-apt-repo.sh | sudo bash
+            
+            # Install
+            sudo apt-get update
+            sudo apt-get install go-dbadmin
+            ```
+            
+            ### Manual Installation
+            
+            Download the `.deb` file and install:
+            
+            ```bash
+            sudo dpkg -i go-dbadmin_*.deb
+            sudo apt-get install -f
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload APT repository to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apt-repo
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

@@ -1,0 +1,74 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+build/
+dist/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Debian build artifacts
+*.deb
+*.changes
+*.buildinfo
+*.dsc
+*.tar.gz
+*.tar.xz
+debian/files
+debian/mysql-web-admin/
+
+# APT repository (local)
+repo/
+apt-repo/
+gh-pages-repo/
+
+# Frontend build
+frontend/dist/
+frontend/.vite/
+
+# Backend build
+backend/bin/
+
+# Local scripts (not for GitHub)
+local-scripts/
+*.sh
+
+# Documentation (not for GitHub)
+docs/

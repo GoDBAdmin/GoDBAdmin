@@ -1,0 +1,10 @@
+go-dbadmin (1.0.0-1) unstable; urgency=medium
+
+  * Initial release
+  * Modern web-based MySQL administration tool
+  * Built with Go (Fiber) and React
+  * Features: database browser, SQL editor, table management
+  * GitHub: https://github.com/GoDBAdmin/GoDBAdmin
+
+ -- mahdifarshid <mahdifarshid@users.noreply.github.com>  Thu, 03 Jan 2024 12:00:00 +0000
+

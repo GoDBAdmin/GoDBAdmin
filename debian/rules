@@ -1,0 +1,35 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Build backend
+	cd backend && go mod download
+	cd backend && CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o ../build/go-dbadmin ./cmd/server
+
+	# Build frontend
+	cd frontend && rm -rf node_modules package-lock.json
+	cd frontend && npm install --legacy-peer-deps
+	cd frontend && npm run build
+
+override_dh_auto_install:
+	# Install binary
+	install -D -m 755 build/go-dbadmin $(CURDIR)/debian/go-dbadmin/usr/bin/go-dbadmin
+
+	# Install frontend assets
+	install -d $(CURDIR)/debian/go-dbadmin/usr/share/go-dbadmin
+	cp -r frontend/dist/* $(CURDIR)/debian/go-dbadmin/usr/share/go-dbadmin/
+
+	# Install config directory
+	install -d $(CURDIR)/debian/go-dbadmin/etc/go-dbadmin
+	install -m 644 config/config.yaml.example $(CURDIR)/debian/go-dbadmin/etc/go-dbadmin/config.yaml.example
+
+	# Install systemd service
+	install -D -m 644 debian/go-dbadmin.service $(CURDIR)/debian/go-dbadmin/etc/systemd/system/go-dbadmin.service
+
+override_dh_auto_clean:
+	rm -rf build/go-dbadmin
+	rm -rf frontend/dist
+	rm -rf frontend/node_modules
+	dh_auto_clean

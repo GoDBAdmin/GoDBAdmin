@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -e
+
+# Create user and group if they don't exist
+if ! getent group go-dbadmin > /dev/null 2>&1; then
+    addgroup --system go-dbadmin
+fi
+
+if ! getent passwd go-dbadmin > /dev/null 2>&1; then
+    adduser --system --ingroup go-dbadmin --home /var/lib/go-dbadmin --shell /bin/false go-dbadmin
+fi
+
+# Create directories
+mkdir -p /var/lib/go-dbadmin
+mkdir -p /var/log/go-dbadmin
+chown -R go-dbadmin:go-dbadmin /var/lib/go-dbadmin
+chown -R go-dbadmin:go-dbadmin /var/log/go-dbadmin
+
+# Create config file if it doesn't exist
+if [ ! -f /etc/go-dbadmin/config.yaml ]; then
+    cp /etc/go-dbadmin/config.yaml.example /etc/go-dbadmin/config.yaml
+    chmod 640 /etc/go-dbadmin/config.yaml
+    chown root:go-dbadmin /etc/go-dbadmin/config.yaml
+fi
+
+# Reload systemd
+systemctl daemon-reload
+
+# Enable service
+systemctl enable go-dbadmin.service
+
+# Start service automatically on fresh install
+# $1 = configure (fresh install) or upgrade
+# $2 = previous version (empty on fresh install)
+if [ "$1" = "configure" ]; then
+    # Start service on fresh install (when $2 is empty)
+    # On upgrade, only start if service was previously enabled and stopped
+    if [ -z "$2" ]; then
+        echo "Starting go-dbadmin service..."
+        systemctl start go-dbadmin.service || {
+            echo "Warning: Failed to start go-dbadmin service"
+            echo "You can start it manually with: sudo systemctl start go-dbadmin"
+        }
+    else
+        # On upgrade, restart if service was running
+        if systemctl is-active --quiet go-dbadmin.service 2>/dev/null; then
+            echo "Restarting go-dbadmin service..."
+            systemctl restart go-dbadmin.service || true
+        fi
+    fi
+fi
+
+echo "GoDBAdmin installed successfully!"
+echo ""
+echo "Configuration file: /etc/go-dbadmin/config.yaml"
+echo "Service status: sudo systemctl status go-dbadmin"
+echo "Access the web interface at: http://localhost:8090"
+echo ""
+echo "GitHub: https://github.com/GoDBAdmin/GoDBAdmin"

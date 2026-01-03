@@ -1,0 +1,26 @@
+[Unit]
+Description=GoDBAdmin - Web-based MySQL Administration Tool
+After=network.target mysql.service
+
+[Service]
+Type=simple
+User=go-dbadmin
+Group=go-dbadmin
+WorkingDirectory=/usr/share/go-dbadmin
+ExecStart=/usr/bin/go-dbadmin
+Restart=always
+RestartSec=5
+Environment="FRONTEND_PATH=/usr/share/go-dbadmin"
+Environment="PORT=8090"
+EnvironmentFile=-/etc/go-dbadmin/config.yaml
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/go-dbadmin /var/log/go-dbadmin
+
+[Install]
+WantedBy=multi-user.target
+

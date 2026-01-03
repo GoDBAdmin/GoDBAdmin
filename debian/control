@@ -1,0 +1,25 @@
+Source: go-dbadmin
+Section: database
+Priority: optional
+Maintainer: mahdifarshid <mahdifarshid@users.noreply.github.com>
+Build-Depends: debhelper (>= 13), golang-go (>= 1.21), nodejs (>= 18), npm
+Standards-Version: 4.6.1
+Homepage: https://github.com/GoDBAdmin/GoDBAdmin
+
+Package: go-dbadmin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, mysql-client | mysql-client-8.0 | default-mysql-client
+Description: Modern web-based MySQL administration tool (GoDBAdmin)
+ A beautiful and fast web-based MySQL database administration tool
+ built with Go and React. Provides an intuitive interface for managing
+ MySQL databases, executing queries, and viewing table data.
+ .
+ Features:
+  - Modern, responsive web interface with dark mode
+  - Fast query execution with connection pooling
+  - Database and table browser with tree view
+  - SQL query editor with syntax highlighting (Monaco Editor)
+  - Table structure viewer
+  - Paginated data viewing
+  - JWT-based authentication
+  - Support for multiple MySQL connections
