@@ -68,7 +68,6 @@ backend/bin/
 
 # Local scripts (not for GitHub)
 local-scripts/
-*.sh
 
 # Documentation (not for GitHub)
 docs/
